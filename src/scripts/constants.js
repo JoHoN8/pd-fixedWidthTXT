@@ -1,0 +1,2 @@
+export const noBlobError = "Blob functionality is not supported in this browser.";
+export const incorrectFileProps = "An array of objects must be provided to setup initial configuration of file generator. Please see jsDocs for fileGenerator class";
