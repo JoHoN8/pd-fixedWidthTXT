@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "devServer": "webpack-dev-server --config ./webpackConfigs/webpack.server.config.js"
+    "dev": "webpack --env dev --config ./webpackConfigs/webpack.config.js",
+    "prod": "webpack --env prod --config ./webpackConfigs/webpack.config.js",
+    "testServer": "webpack-dev-server --config ./webpackConfigs/webpack.server.config_tests.js"
   },
   "license": "ISC",
   "dependencies": {

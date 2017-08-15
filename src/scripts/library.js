@@ -29,6 +29,10 @@ import * as constants from './constants';
             var isFileSaverSupported = !!new Blob;
         } catch (e) {
             alert(constants.noBlobError);
+            propsGood = false;
+        }
+        if (!String.prototype.repeat) {
+            alert(constants.noStringRepet);
         }
         if (!Array.isArray(data)) {
             //not an array, it must be array
@@ -36,7 +40,7 @@ import * as constants from './constants';
         }
         let propsGood = true;
         data.some(item => {
-            if (!item.fieldName || !item.fieldLength || !item.dataSource) {
+            if (!item.fieldLength || !item.dataField) {
                 propsGood = false;
                 return true;
             }
@@ -44,26 +48,46 @@ import * as constants from './constants';
         return propsGood;
     }
     _createPadding(data, fieldLength) {
-        let paddingToCreate = fieldLength - data;
+        let paddingToCreate = fieldLength - data.length;
         return " ".repeat(paddingToCreate);
+    }
+    _ensureString(data) {
+        if (typeof data === 'number') {
+            return data.toString();
+        } else if (typeof data === 'string') {
+            return data;
+        } else {
+            throw new Error(constants.invalidDataType);
+        }
     }
     _createRow(rowObj) {
 
         let row = "";
         this.fileProps.forEach(prop => {
-            let fieldData = rowObj[prop.dataField];
+            let fieldData = this._ensureString(rowObj[prop.dataField]);
             let padding = this._createPadding(fieldData, prop.fieldLength);
             row += (padding + fieldData);
         });
         return row;
     }
+    /**
+     * Adds data to be placed in the generated file. Data should be an array of objects.
+     * ensure the properties of the object match the dataField property of the constructor parimeter.
+     * 
+     * @param {object[]} data 
+     */
     addData(data) {
         if (!this.fileData) {
             this.fileData = [];
         }
         this.fileData = this.fileData.concat(data);
     }
-    generateFile(fileName) {
+    /**
+     * Generates the text file from the data that was provided to the addData method.
+     * Once the file is generated it will prompt yoou for a filename and a location to save the file.
+     * @param {string} fileName 
+     */
+    generateFile() {
 
         let fileDataPrepped = [];
 
@@ -71,7 +95,7 @@ import * as constants from './constants';
             fileDataPrepped.push(this._createRow(currentRow));
         });
 
-        let blobData = new Blob([fileDataPrepped.join("/r/n")], {type: "text/plain;charset=utf-8"});
-        fileSaver.saveAs(blobData, `${fileName}.txt`);
+        let blobData = new Blob([fileDataPrepped.join("\r\n")], {type: "text/plain;charset=utf-8"});
+        fileSaver.saveAs(blobData);
     }
  }
